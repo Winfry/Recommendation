@@ -16,7 +16,7 @@ Emily,The Godfather,5
 Alice,Inception,3
 Paul,The Godfather,5
 Carol,Pulp Fiction,4
-"Ivy,",Star Wars,5
+Ivy,Star Wars,5
 Emily,Forrest Gump,3
 Quincy,The Matrix,4
 Ivy,The Matrix,4
@@ -31,7 +31,7 @@ Leo,Titanic,4
 Mia,The Godfather,5
 Nina,Star Wars,5
 Oscar,The Matrix,4
-Sarah,Star Wars,5
+Sarah,Star Wars,5x
 Tom,Pulp Fiction,Five
 Karen,Inception,5
 Leo,Inception,2
@@ -44,12 +44,12 @@ Victor,The Godfather,
 Wendy,Pulp Fiction,4
 Zane,Pulp Fiction,3.5
 Uma,Titanic,5
-Victor,The Matrix,x
+Victor,Matrix,x
 Wendy,The Matrix,3.5
 Xander,Forrest Gump,5
-Yara,Inception,5
+Yara,Inception,5y
 Zane,Forrest Gump,3.5
-Uma,Star Wars,2
+Uma,Star Wars,2?
 Yara,The Matrix,
 Karen,Pulp Fiction,4
 Leo,Forrest Gump,5
