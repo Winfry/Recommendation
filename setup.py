@@ -5,6 +5,7 @@ import model
 
 data = pd.read_csv("data(1).txt")
 data.to_csv('data.csv', index=None )
+
 def find_prediction_by(user_id, um_matrix, mm_matrix):
     prediction = model.Prediction(model.User(user_id))
     smovie_ids = um_matrix.get_id_movies_seen_by(user_id)
