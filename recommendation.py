@@ -12,13 +12,10 @@ def read_csv(path=r'./ml-latest-small/'):
     :param path:file path
     :return:csv data as DataFrame
     """
-    try:
-        data = pd.read_csv("data(1).txt")
-        data.to_csv('data.csv', index=None )
-    except:
-        print('Open file error')
-    return data
-
+   
+    data = pd.read_csv("data(1).txt")
+    data.to_csv('data.csv', index=None )
+   
 movie_ratingCount = (data.groupby(by = ['Movie'])['Rating'].
                      count().
                      reset_index().
@@ -28,7 +25,7 @@ movie_ratingCount.head()
 rating_with_totalRatingCount = data.merge(movie_ratingCount, left_on = 'title', right_on = 'title', how = 'left')
 popularity_threshold = rating_with_totalRatingCount["totalRatingCount"].mean()
 rating_popular_movie= rating_with_totalRatingCount.query('totalRatingCount >= @popularity_threshold')
-movie_features_df=rating_popular_movie.pivot_table(index='title',columns='userId',values='rating').fillna(0)
+movie_features_df=rating_popular_movie.pivot_table(index='Movie',columns='User',values='Rating').fillna(0)
 from scipy.sparse import csr_matrix
 
 movie_features_df_matrix = csr_matrix(movie_features_df.values)
