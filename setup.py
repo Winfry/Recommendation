@@ -60,6 +60,6 @@ def run(n_movies, json_file):
                                moviemoviematrix))
     for pred in predictions:
         recommendation = pred.get_n_greatest(n_movies)
-        print '# The recommended movie for the user: %s' % pred.user.id
+        print ('# The recommended movie for the user: %s' % pred.user.id)
         for key, value in recommendation.iteritems():
-            print filter(lambda x: x.id == key, movies)[0].name
+            print (filter(lambda x: x.id == key, movies)[0].name)
