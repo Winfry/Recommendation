@@ -127,7 +127,7 @@ def analysis(data,threshold = 3):
 
     #count the rating of users
     for row in train.itertuples(index=True, name='Pandas'):
-        mat[row.userId - 1, np.where(movie_index == row.movieId)[0][0]] = row.rating
+        mat[row.User - 1, np.where(movie_index == row.Movie)[0][0]] = row.Rating
     #set zero when elements smaller that threshold
     mat_like = (mat > threshold) + 0
     mat_dislike = ((mat > 0) + 0) * ((mat <= threshold)+0)
