@@ -1,77 +1,97 @@
-from sklearn.model_selection import train_test_split
-import numpy as np
 import pandas as pd
-from sklearn.metrics import auc
-import matplotlib.pyplot as plt
-from IPython.display import display, Markdown
-import streamlit as st
+import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+###### helper functions. Use them when needed #######
+def get_title_from_index(index):
+	return data[data.index == index]["index"].values[0]
 
-def read_csv(path=r'./ml-latest-small/'):
-    """
+def get_index_from_title(Movie):
+	return data[data.Movie == Movie]["Movie"].values[0]
+
+def get_rating_from_index(index):
+	return data[data.index == index]["Rating"].values[0]
+
+def get_index_from_title(Rating):
+	return data[data.Rating== Rating]["Rating"].values[0]
+
+##################################################
+
+##Step 1: Read CSV File
+"""
     read csv file
     :param path:file path
     :return:csv data as DataFrame
     """
+data = pd.read_csv("data(1).txt")
+data.to_csv('data.csv', index=None )
    
-    data = pd.read_csv("data(1).txt")
-    data.to_csv('data.csv', index=None )
-   
-movie_ratingCount = (data.groupby(by = ['Movie'])['Rating'].
-                     count().
-                     reset_index().
-                     rename(columns = {'Rating': 'totalRatingCount'})
-                     [['Movie', 'totalRatingCount']])
-movie_ratingCount.head()
-rating_with_totalRatingCount = data.merge(movie_ratingCount, left_on = 'title', right_on = 'title', how = 'left')
-popularity_threshold = rating_with_totalRatingCount["totalRatingCount"].mean()
-rating_popular_movie= rating_with_totalRatingCount.query('totalRatingCount >= @popularity_threshold')
-movie_features_df=rating_popular_movie.pivot_table(index='Movie',columns='User',values='Rating').fillna(0)
-from scipy.sparse import csr_matrix
+##Step 2: Select Features
 
-movie_features_df_matrix = csr_matrix(movie_features_df.values)
+features = ['Rating', 'Movie', 'User']
+##Step 3: Create a column in DF which combines all selected features
+for feature in features:
+	data[feature] = data[feature].fillna('')
 
-from sklearn.neighbors import NearestNeighbors
+def combine_feature(row):
+	try:
+		return row['Rating'] +' '+ row["User"] + " " + row['Movie'] 
+	except:
+		print('Error : \n', row)
+data['combined_features'] = data.apply(combine_feature, axis=1)
+
+#print(df['combined_features'].head())
+##Step 4: Create count matrix from this new combined column
+cv = CountVectorizer()
+cv_fit=cv.fit_transform(data['combined_features'])
+
+def get_movie_from_index(data, index):
+    filtered_data = data[data.index == index]
+    if not filtered_data.empty:
+        return filtered_data["Movie"].values[0]
+    else:
+        # Handle the case where there are no elements with the specified index
+        return None  # Or return a default value or raise an exception, depending on your requirements
+
+# Example usage:
+index = 3 
+movie = get_movie_from_index(data, index)
+if movie is not None:
+    print(f"Movie for index {index}: {movie}")
+else:
+    print(f"No movie found for index {index}")
+
+##Step 5: Compute the Cosine Similarity based on the count_matrix
+similarity = cosine_similarity(cv_fit )
+high_ratings = input("Enter highest Rated Movies:")
+ # Logic on User Ratings
+if not user:
+    similarity = cosine_similarity(high_ratings.T)
+    
+else:
+    print("Not enough ratings to calculate similarity.")
 
 
-model_knn = NearestNeighbors(metric = 'cosine', algorithm = 'brute')
-model_knn.fit(movie_features_df_matrix)
+## Step 6: Get index of this movie from its title
+rating_index = get_rating_from_index(high_ratings)
+try:
+    movie_index = int(rating_index)
+    similar_movies = list(similarity[movie_index])
+except IndexError:
+    print("Invalid movie index.")
+except ValueError:
+    print("Invalid movie index format. Must be an integer.")
 
-def ww(m):
-    for i, value in enumerate(movie_features_df.index):
-        if m==value:
-            query_index = i
-            print(query_index)
-            distances, indices = model_knn.kneighbors(movie_features_df.iloc[query_index,:].values.reshape(1, -1), n_neighbors = 6)
-        else:
-            pass
-    return distances,indices,query_index
-   
-def main():
-    global z
-    while z:
-        st.title("Movie Recommendation")
-        html_temp = """
-        <div style="background-color:tomato;padding:10px">
-        <h2 style="color:white;text-align:center;">Movie Recommendation using streamlit </h2>
-        </div>
-        """
-        st.markdown(html_temp,unsafe_allow_html=True)    
-        #print(widget_ids_this_run)
-        m = st.text_input("Enter the name and year of the movie","Type here",key='ab#@007!')
-        if st.button("Predict"):
-            result,result1,result2=ww(m)
-            for i in range(0, len(result.flatten())):
-                if i == 0:
-                    st.text('Recommendations for {0}:\n'.format(movie_features_df.index[result2]))
-                else:
-                    st.text('{0}: {1}, with distance of {2}:'.format(i, movie_features_df.index[result1.flatten()[i]], result.flatten()[i]))
-            st.text("do you want to continue")
-        if st.button("No"):
-            st.text("Thank you for using our software")
-            z=False
-            break
-        else:
-            z=True
-        
-if __name__=="__main__":
-    main()
+
+
+## Step 7: Get a list of similar movies in descending order of similarity score
+sorted_similar_movies = sorted(similar_movies, key= lambda x: x[1], reverse = True)
+
+## Step 8: Print titles of first 50 movies
+i = 0
+for mo in sorted_similar_movies:
+	print(get_title_from_index(mo[0]))
+	i = i+ 1
+	if i>50:
+		break
+
