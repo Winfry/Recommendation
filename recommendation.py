@@ -65,7 +65,7 @@ else:
 similarity = cosine_similarity(cv_fit )
 high_ratings = input("Enter highest Rated Movies:")
  # Logic on User Ratings
-if not user:
+if not high_ratings:
     similarity = cosine_similarity(high_ratings.T)
     
 else:
